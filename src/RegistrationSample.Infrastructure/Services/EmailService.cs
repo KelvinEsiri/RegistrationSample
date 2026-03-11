@@ -32,8 +32,9 @@ public class EmailService : IEmailService
             return;
         }
 
+        int smtpPort = int.TryParse(emailSettings["Port"], out var parsedPort) ? parsedPort : 587;
         using var client = new SmtpClient();
-        await client.ConnectAsync(smtpHost, int.Parse(emailSettings["Port"] ?? "587"), SecureSocketOptions.StartTls);
+        await client.ConnectAsync(smtpHost, smtpPort, SecureSocketOptions.StartTls);
         await client.AuthenticateAsync(emailSettings["Username"], emailSettings["Password"]);
         await client.SendAsync(message);
         await client.DisconnectAsync(true);
