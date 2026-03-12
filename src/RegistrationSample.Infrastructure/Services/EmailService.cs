@@ -2,7 +2,7 @@ using MailKit.Net.Smtp;
 using MailKit.Security;
 using Microsoft.Extensions.Configuration;
 using MimeKit;
-using RegistrationSample.Domain.Interfaces;
+using RegistrationSample.Application.Interfaces;
 
 namespace RegistrationSample.Infrastructure.Services;
 

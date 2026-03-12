@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Identity;
 using RegistrationSample.Application.DTOs;
 using RegistrationSample.Application.Interfaces;
 using RegistrationSample.Domain.Entities;
-using RegistrationSample.Domain.Interfaces;
 
 namespace RegistrationSample.Infrastructure.Services;
 
@@ -31,15 +30,22 @@ public class UserProfileService : IUserProfileService
             ?? throw new KeyNotFoundException("User not found.");
 
         user.FirstName = dto.FirstName;
+        user.MiddleName = dto.MiddleName;
         user.LastName = dto.LastName;
         user.DateOfBirth = dto.DateOfBirth;
         user.Gender = dto.Gender;
+        user.MaritalStatus = dto.MaritalStatus;
         user.PhoneNumber = dto.Phone;
+        user.ProfilePictureUrl = dto.ProfilePictureUrl;
         user.Address = dto.Address;
         user.City = dto.City;
         user.State = dto.State;
         user.Country = dto.Country;
         user.PostalCode = dto.PostalCode;
+        user.Occupation = dto.Occupation;
+        user.Employer = dto.Employer;
+        user.YearsOfExperience = dto.YearsOfExperience;
+        user.LinkedInUrl = dto.LinkedInUrl;
         user.Institution = dto.Institution;
         user.Degree = dto.Degree;
         user.FieldOfStudy = dto.FieldOfStudy;
@@ -54,7 +60,14 @@ public class UserProfileService : IUserProfileService
         if (!result.Succeeded)
             throw new InvalidOperationException(string.Join(", ", result.Errors.Select(e => e.Description)));
 
-        await _emailService.SendProfileUpdateEmailAsync(user.Email!, $"{user.FirstName} {user.LastName}");
+        try
+        {
+            await _emailService.SendProfileUpdateEmailAsync(user.Email!, $"{user.FirstName} {user.LastName}");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[EMAIL ERROR] Failed to send profile update email to {user.Email}: {ex.Message}");
+        }
 
         return MapToDto(user);
     }
@@ -63,10 +76,12 @@ public class UserProfileService : IUserProfileService
     {
         Id = user.Id,
         FirstName = user.FirstName,
+        MiddleName = user.MiddleName,
         LastName = user.LastName,
         Email = user.Email!,
         DateOfBirth = user.DateOfBirth,
         Gender = user.Gender,
+        MaritalStatus = user.MaritalStatus,
         Phone = user.PhoneNumber ?? string.Empty,
         Address = user.Address,
         City = user.City,
@@ -74,6 +89,10 @@ public class UserProfileService : IUserProfileService
         Country = user.Country,
         PostalCode = user.PostalCode,
         ProfilePictureUrl = user.ProfilePictureUrl,
+        Occupation = user.Occupation,
+        Employer = user.Employer,
+        YearsOfExperience = user.YearsOfExperience,
+        LinkedInUrl = user.LinkedInUrl,
         Institution = user.Institution,
         Degree = user.Degree,
         FieldOfStudy = user.FieldOfStudy,

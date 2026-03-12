@@ -63,11 +63,7 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-using (var scope = app.Services.CreateScope())
-{
-    var db = scope.ServiceProvider.GetRequiredService<RegistrationSample.Infrastructure.Data.ApplicationDbContext>();
-    db.Database.EnsureCreated();
-}
+app.Services.ApplyMigrations();
 
 if (app.Environment.IsDevelopment())
 {

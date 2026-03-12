@@ -1,4 +1,4 @@
-namespace RegistrationSample.Domain.Interfaces;
+namespace RegistrationSample.Application.Interfaces;
 
 public interface IEmailService
 {

@@ -2,7 +2,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
-using RegistrationSample.Application.DTOs;
+using RegistrationSample.Web.Models;
 
 namespace RegistrationSample.Web.Controllers;
 
@@ -42,7 +42,7 @@ public class ProfileController : Controller
         }
 
         var body = await response.Content.ReadAsStringAsync();
-        var profile = JsonSerializer.Deserialize<UserProfileDto>(body, _jsonOptions);
+        var profile = JsonSerializer.Deserialize<UserProfileViewModel>(body, _jsonOptions);
         return View(profile);
     }
 
@@ -63,20 +63,27 @@ public class ProfileController : Controller
         }
 
         var body = await response.Content.ReadAsStringAsync();
-        var profile = JsonSerializer.Deserialize<UserProfileDto>(body, _jsonOptions);
+        var profile = JsonSerializer.Deserialize<UserProfileViewModel>(body, _jsonOptions);
 
-        var updateDto = new UpdateProfileDto
+        var updateDto = new EditProfileViewModel
         {
             FirstName = profile!.FirstName,
+            MiddleName = profile.MiddleName,
             LastName = profile.LastName,
             DateOfBirth = profile.DateOfBirth,
             Gender = profile.Gender,
+            MaritalStatus = profile.MaritalStatus,
             Phone = profile.Phone,
+            ProfilePictureUrl = profile.ProfilePictureUrl,
             Address = profile.Address,
             City = profile.City,
             State = profile.State,
             Country = profile.Country,
             PostalCode = profile.PostalCode,
+            Occupation = profile.Occupation,
+            Employer = profile.Employer,
+            YearsOfExperience = profile.YearsOfExperience,
+            LinkedInUrl = profile.LinkedInUrl,
             Institution = profile.Institution,
             Degree = profile.Degree,
             FieldOfStudy = profile.FieldOfStudy,
@@ -91,7 +98,7 @@ public class ProfileController : Controller
     }
 
     [HttpPost]
-    public async Task<IActionResult> Edit(UpdateProfileDto model)
+    public async Task<IActionResult> Edit(EditProfileViewModel model)
     {
         var redirect = RedirectIfNotAuthenticated();
         if (redirect != null) return redirect;

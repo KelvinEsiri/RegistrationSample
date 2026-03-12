@@ -1,4 +1,4 @@
-@model RegistrationSample.Application.DTOs.UpdateProfileDto
+@model RegistrationSample.Web.Models.EditProfileViewModel
 @{
     ViewData["Title"] = "Edit Profile";
 }
@@ -27,15 +27,20 @@
 
                     <h5 class="section-title"><i class="fas fa-user me-2"></i>Personal Information</h5>
                     <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label asp-for="FirstName" class="form-label">First Name <span class="text-danger">*</span></label>
-                            <input asp-for="FirstName" class="form-control" />
-                            <span asp-validation-for="FirstName" class="text-danger small"></span>
+                        <div class="col-md-4 mb-3">
+                            <label asp-for="FirstName" class="form-label">First Name <span class="text-muted small">(cannot be changed)</span></label>
+                            <input asp-for="FirstName" class="form-control bg-light" disabled />
+                            <input asp-for="FirstName" type="hidden" />
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label asp-for="LastName" class="form-label">Last Name <span class="text-danger">*</span></label>
-                            <input asp-for="LastName" class="form-control" />
-                            <span asp-validation-for="LastName" class="text-danger small"></span>
+                        <div class="col-md-4 mb-3">
+                            <label asp-for="MiddleName" class="form-label">Middle Name <span class="text-muted small">(cannot be changed)</span></label>
+                            <input asp-for="MiddleName" class="form-control bg-light" disabled />
+                            <input asp-for="MiddleName" type="hidden" />
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label asp-for="LastName" class="form-label">Last Name <span class="text-muted small">(cannot be changed)</span></label>
+                            <input asp-for="LastName" class="form-control bg-light" disabled />
+                            <input asp-for="LastName" type="hidden" />
                         </div>
                     </div>
                     <div class="row">
@@ -49,7 +54,19 @@
                                 <option value="">-- Select --</option>
                                 <option value="Male">Male</option>
                                 <option value="Female">Female</option>
-                                <option value="Non-binary">Non-binary</option>
+                                <option value="Prefer not to say">Prefer not to say</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="MaritalStatus" class="form-label">Marital Status</label>
+                            <select asp-for="MaritalStatus" class="form-select">
+                                <option value="">-- Select --</option>
+                                <option value="Single">Single</option>
+                                <option value="Married">Married</option>
+                                <option value="Divorced">Divorced</option>
+                                <option value="Widowed">Widowed</option>
                                 <option value="Prefer not to say">Prefer not to say</option>
                             </select>
                         </div>
@@ -57,6 +74,11 @@
                     <div class="mb-3">
                         <label asp-for="Phone" class="form-label">Phone Number</label>
                         <input asp-for="Phone" class="form-control" />
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="ProfilePictureUrl" class="form-label">Profile Picture URL</label>
+                        <input asp-for="ProfilePictureUrl" class="form-control" placeholder="https://example.com/photo.jpg" />
+                        <span asp-validation-for="ProfilePictureUrl" class="text-danger small"></span>
                     </div>
 
                     <h5 class="section-title mt-3"><i class="fas fa-map-marker-alt me-2"></i>Address</h5>
@@ -81,6 +103,29 @@
                     <div class="mb-3">
                         <label asp-for="Country" class="form-label">Country</label>
                         <input asp-for="Country" class="form-control" />
+                    </div>
+
+                    <h5 class="section-title mt-3"><i class="fas fa-briefcase me-2"></i>Professional Information</h5>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Occupation" class="form-label">Occupation</label>
+                            <input asp-for="Occupation" class="form-control" />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Employer" class="form-label">Employer / Company</label>
+                            <input asp-for="Employer" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="YearsOfExperience" class="form-label">Years of Experience</label>
+                            <input asp-for="YearsOfExperience" type="number" class="form-control" min="0" max="60" />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="LinkedInUrl" class="form-label">LinkedIn Profile URL</label>
+                            <input asp-for="LinkedInUrl" class="form-control" />
+                            <span asp-validation-for="LinkedInUrl" class="text-danger small"></span>
+                        </div>
                     </div>
 
                     <h5 class="section-title mt-3"><i class="fas fa-graduation-cap me-2"></i>Academic Information</h5>
@@ -126,10 +171,13 @@
                             <label asp-for="AcademicYear" class="form-label">Academic Year</label>
                             <select asp-for="AcademicYear" class="form-select">
                                 <option value="">-- Select --</option>
-                                <option value="Freshman">Freshman</option>
-                                <option value="Sophomore">Sophomore</option>
-                                <option value="Junior">Junior</option>
-                                <option value="Senior">Senior</option>
+                                <option value="100lvl (Freshman)">100lvl (Freshman)</option>
+                                <option value="200lvl (Sophomore)">200lvl (Sophomore)</option>
+                                <option value="300lvl (Junior)">300lvl (Junior)</option>
+                                <option value="400lvl (Senior)">400lvl (Senior)</option>
+                                <option value="500lvl (Senior)">500lvl (Senior)</option>
+                                <option value="600lvl (Senior)">600lvl (Senior)</option>
+                                <option value="Postgraduate">Postgraduate</option>
                                 <option value="Graduate">Graduate</option>
                                 <option value="Alumni">Alumni</option>
                             </select>

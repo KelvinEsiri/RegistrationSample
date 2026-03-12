@@ -1,4 +1,4 @@
-@model RegistrationSample.Application.DTOs.UserProfileDto
+@model RegistrationSample.Web.Models.UserProfileViewModel
 @{
     ViewData["Title"] = "My Profile";
 }
@@ -24,9 +24,17 @@
     <div class="col-md-4 mb-4">
         <div class="card text-center p-4">
             <div class="d-flex justify-content-center mb-3">
-                <div class="profile-avatar">
-                    @(Model?.FirstName?.Substring(0, 1).ToUpper())@(Model?.LastName?.Substring(0, 1).ToUpper())
-                </div>
+                @if (!string.IsNullOrEmpty(Model?.ProfilePictureUrl))
+                {
+                    <img src="@Model.ProfilePictureUrl" alt="Profile Picture"
+                         class="rounded-circle" style="width:100px;height:100px;object-fit:cover;" />
+                }
+                else
+                {
+                    <div class="profile-avatar">
+                        @(Model?.FirstName?.Substring(0, 1).ToUpper())@(Model?.LastName?.Substring(0, 1).ToUpper())
+                    </div>
+                }
             </div>
             <h4>@Model?.FirstName @Model?.LastName</h4>
             <p class="text-muted mb-1"><i class="fas fa-envelope me-1"></i>@Model?.Email</p>
@@ -47,12 +55,28 @@
             <div class="card-body">
                 <div class="row">
                     <div class="col-sm-6 mb-3">
+                        <div class="info-label">First Name</div>
+                        <div class="info-value">@Model?.FirstName</div>
+                    </div>
+                    <div class="col-sm-6 mb-3">
+                        <div class="info-label">Last Name</div>
+                        <div class="info-value">@Model?.LastName</div>
+                    </div>
+                    <div class="col-sm-6 mb-3">
+                        <div class="info-label">Middle Name</div>
+                        <div class="info-value">@(string.IsNullOrEmpty(Model?.MiddleName) ? "—" : Model?.MiddleName)</div>
+                    </div>
+                    <div class="col-sm-6 mb-3">
                         <div class="info-label">Date of Birth</div>
                         <div class="info-value">@Model?.DateOfBirth.ToString("MMMM dd, yyyy")</div>
                     </div>
                     <div class="col-sm-6 mb-3">
                         <div class="info-label">Gender</div>
                         <div class="info-value">@Model?.Gender</div>
+                    </div>
+                    <div class="col-sm-6 mb-3">
+                        <div class="info-label">Marital Status</div>
+                        <div class="info-value">@(string.IsNullOrEmpty(Model?.MaritalStatus) ? "—" : Model?.MaritalStatus)</div>
                     </div>
                     <div class="col-sm-6 mb-3">
                         <div class="info-label">Phone</div>
@@ -71,6 +95,38 @@
                                 @if (!string.IsNullOrEmpty(Model?.City)) { <text>, @Model.City</text> }
                                 @if (!string.IsNullOrEmpty(Model?.State)) { <text>, @Model.State</text> }
                                 @if (!string.IsNullOrEmpty(Model?.PostalCode)) { <text> @Model.PostalCode</text> }
+                            }
+                            else { <span>—</span> }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-briefcase me-2 text-primary"></i>Professional Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-sm-6 mb-3">
+                        <div class="info-label">Occupation</div>
+                        <div class="info-value">@(string.IsNullOrEmpty(Model?.Occupation) ? "—" : Model?.Occupation)</div>
+                    </div>
+                    <div class="col-sm-6 mb-3">
+                        <div class="info-label">Employer</div>
+                        <div class="info-value">@(string.IsNullOrEmpty(Model?.Employer) ? "—" : Model?.Employer)</div>
+                    </div>
+                    <div class="col-sm-6 mb-3">
+                        <div class="info-label">Years of Experience</div>
+                        <div class="info-value">@(Model?.YearsOfExperience == 0 ? "—" : Model?.YearsOfExperience.ToString())</div>
+                    </div>
+                    <div class="col-sm-6 mb-3">
+                        <div class="info-label">LinkedIn</div>
+                        <div class="info-value">
+                            @if (!string.IsNullOrEmpty(Model?.LinkedInUrl))
+                            {
+                                <a href="@Model.LinkedInUrl" target="_blank" rel="noopener noreferrer">@Model.LinkedInUrl</a>
                             }
                             else { <span>—</span> }
                         </div>

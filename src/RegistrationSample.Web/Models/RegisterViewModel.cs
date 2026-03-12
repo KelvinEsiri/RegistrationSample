@@ -1,8 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace RegistrationSample.Application.DTOs;
+namespace RegistrationSample.Web.Models;
 
-public class RegisterDto
+public class RegisterViewModel
 {
     // Personal Information
     [Required] public string FirstName { get; set; } = string.Empty;

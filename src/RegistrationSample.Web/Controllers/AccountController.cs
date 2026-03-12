@@ -2,7 +2,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
-using RegistrationSample.Application.DTOs;
+using RegistrationSample.Web.Models;
 
 namespace RegistrationSample.Web.Controllers;
 
@@ -20,7 +20,7 @@ public class AccountController : Controller
     public IActionResult Register() => View();
 
     [HttpPost]
-    public async Task<IActionResult> Register(RegisterDto model)
+    public async Task<IActionResult> Register(RegisterViewModel model)
     {
         if (!ModelState.IsValid) return View(model);
 
@@ -32,7 +32,7 @@ public class AccountController : Controller
         if (response.IsSuccessStatusCode)
         {
             var responseBody = await response.Content.ReadAsStringAsync();
-            var auth = JsonSerializer.Deserialize<AuthResponseDto>(responseBody, _jsonOptions);
+            var auth = JsonSerializer.Deserialize<AuthResponseViewModel>(responseBody, _jsonOptions);
             HttpContext.Session.SetString("Token", auth!.Token);
             HttpContext.Session.SetString("UserId", auth.UserId);
             HttpContext.Session.SetString("FullName", auth.FullName);
@@ -54,7 +54,7 @@ public class AccountController : Controller
     public IActionResult Login() => View();
 
     [HttpPost]
-    public async Task<IActionResult> Login(LoginDto model)
+    public async Task<IActionResult> Login(LoginViewModel model)
     {
         if (!ModelState.IsValid) return View(model);
 
@@ -66,7 +66,7 @@ public class AccountController : Controller
         if (response.IsSuccessStatusCode)
         {
             var responseBody = await response.Content.ReadAsStringAsync();
-            var auth = JsonSerializer.Deserialize<AuthResponseDto>(responseBody, _jsonOptions);
+            var auth = JsonSerializer.Deserialize<AuthResponseViewModel>(responseBody, _jsonOptions);
             HttpContext.Session.SetString("Token", auth!.Token);
             HttpContext.Session.SetString("UserId", auth.UserId);
             HttpContext.Session.SetString("FullName", auth.FullName);

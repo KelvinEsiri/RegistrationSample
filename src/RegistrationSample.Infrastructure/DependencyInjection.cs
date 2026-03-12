@@ -4,7 +4,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using RegistrationSample.Application.Interfaces;
 using RegistrationSample.Domain.Entities;
-using RegistrationSample.Domain.Interfaces;
 using RegistrationSample.Infrastructure.Data;
 using RegistrationSample.Infrastructure.Services;
 
@@ -34,5 +33,12 @@ public static class DependencyInjection
         services.AddScoped<IEmailService, EmailService>();
 
         return services;
+    }
+
+    public static void ApplyMigrations(this IServiceProvider services)
+    {
+        using var scope = services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        db.Database.Migrate();
     }
 }

@@ -7,7 +7,6 @@ using Microsoft.IdentityModel.Tokens;
 using RegistrationSample.Application.DTOs;
 using RegistrationSample.Application.Interfaces;
 using RegistrationSample.Domain.Entities;
-using RegistrationSample.Domain.Interfaces;
 
 namespace RegistrationSample.Infrastructure.Services;
 
@@ -35,15 +34,21 @@ public class AuthService : IAuthService
             UserName = dto.Email,
             Email = dto.Email,
             FirstName = dto.FirstName,
+            MiddleName = dto.MiddleName,
             LastName = dto.LastName,
             DateOfBirth = dto.DateOfBirth,
             Gender = dto.Gender,
+            MaritalStatus = dto.MaritalStatus,
             PhoneNumber = dto.Phone,
             Address = dto.Address,
             City = dto.City,
             State = dto.State,
             Country = dto.Country,
             PostalCode = dto.PostalCode,
+            Occupation = dto.Occupation,
+            Employer = dto.Employer,
+            YearsOfExperience = dto.YearsOfExperience,
+            LinkedInUrl = dto.LinkedInUrl,
             Institution = dto.Institution,
             Degree = dto.Degree,
             FieldOfStudy = dto.FieldOfStudy,
@@ -60,7 +65,14 @@ public class AuthService : IAuthService
         if (!result.Succeeded)
             throw new InvalidOperationException(string.Join(", ", result.Errors.Select(e => e.Description)));
 
-        await _emailService.SendWelcomeEmailAsync(user.Email, $"{user.FirstName} {user.LastName}");
+        try
+        {
+            await _emailService.SendWelcomeEmailAsync(user.Email, $"{user.FirstName} {user.LastName}");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[EMAIL ERROR] Failed to send welcome email to {user.Email}: {ex.Message}");
+        }
 
         return GenerateToken(user);
     }
