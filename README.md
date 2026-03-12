@@ -1,19 +1,35 @@
 # RegistrationSample
 
-A full-stack user registration and profile management application built with **ASP.NET Core 9**, following **Clean Architecture** principles. It consists of a REST API backend and an MVC web frontend.
+A full-stack user registration and profile management application built with **ASP.NET Core 8**, following **Clean Architecture** principles. It consists of a REST API backend and a Blazor WebAssembly frontend.
+
+---
+
+## Changelog
+
+### 2026-03-12 — User Profile Management Features
+
+- **New personal fields:** `middleName`, `maritalStatus` added to registration, profile view, and profile edit.
+- **New professional section:** `occupation`, `employer`, `yearsOfExperience`, `linkedInUrl` added to all DTOs, the `User` entity, and both web views.
+  - **View Models added:** `RegisterViewModel`, `LoginViewModel`, `EditProfileViewModel`, `UserProfileViewModel`, `AuthResponseViewModel` — used as strongly-typed Blazor form models.
+- **EF Core migrations:** `AddProfessionalDetails` and `AddMaritalStatus` applied to the SQLite schema.
+- **Profile picture URL** is now updatable via `PUT /api/profile`.
+- **Security fix:** Upgraded `MimeKit` to 4.15.1 to resolve a CRLF injection vulnerability; SMTP port parsing made safe against invalid config values.
+- **CORS** origins updated to align with the Web project's development URLs.
 
 ---
 
 ## Features
 
-- User registration with personal and academic information
+- User registration with personal, professional, and academic information
 - JWT-based authentication (login / token issuance)
 - Protected profile view and update endpoints
 - ASP.NET Core Identity for password hashing and user management
 - SQLite database (zero-configuration, file-based)
+- EF Core code-first migrations
 - Swagger UI for API exploration
-- MVC web frontend that consumes the API via `HttpClient`
-- Email service integration (configurable SMTP)
+- Blazor WebAssembly frontend (client-side SPA) that consumes the API via `HttpClient`
+- JWT stored in `localStorage` via `TokenService`; injected into requests by `ApiAuthorizationMessageHandler`
+- Email service integration (configurable SMTP via MailKit)
 
 ---
 
@@ -21,7 +37,7 @@ A full-stack user registration and profile management application built with **A
 
 ### Framework — .NET 8 / ASP.NET Core 8
 
-Both the API and Web projects target `net8.0` using the `Microsoft.NET.Sdk.Web` SDK.
+All projects target `net8.0`. The API uses `Microsoft.NET.Sdk.Web`; the Web project uses `Microsoft.NET.Sdk.BlazorWebAssembly`.
 
 ```xml
 <PropertyGroup>
@@ -102,15 +118,15 @@ You can test all endpoints (including authenticated ones by pasting your JWT) di
 
 ---
 
-### Frontend — ASP.NET Core MVC (Server-Side Rendering)
+### Frontend — Blazor WebAssembly (Client-Side SPA)
 
-`RegistrationSample.Web` uses Razor Views rendered on the server. It communicates with the API via `HttpClient`:
+`RegistrationSample.Web` is a Blazor WebAssembly application — the .NET runtime and app are downloaded to the browser and run entirely client-side. It communicates with the API via `HttpClient`:
 
 ```
-Browser  →  MVC Web (Razor Views)  →  HttpClient  →  REST API
+Browser (Blazor WASM)  →  HttpClient + ApiAuthorizationMessageHandler  →  REST API
 ```
 
-There is no client-side JavaScript framework. HTML is generated server-side on every request.
+Authentication state is managed by `TokenService`, which persists the JWT in `localStorage`. `ApiAuthorizationMessageHandler` automatically attaches the `Authorization: Bearer` header to every outgoing API request.
 
 ---
 
@@ -124,22 +140,24 @@ RegistrationSample/
 ├── RegistrationSample.Application     # DTOs, application service interfaces
 ├── RegistrationSample.Infrastructure  # EF Core, ASP.NET Identity, service implementations
 ├── RegistrationSample.API             # ASP.NET Core Web API (backend)
-└── RegistrationSample.Web             # ASP.NET Core MVC (frontend)
+└── RegistrationSample.Web             # Blazor WebAssembly SPA (frontend)
 ```
 
 ### Dependency flow
 
 ```
-API / Web  →  Application  →  Domain
-                 ↑
-           Infrastructure
+API  →  Application  →  Domain
+              ↑
+        Infrastructure
+
+Blazor WASM (browser)  →  REST API  (via HttpClient)
 ```
 
 ---
 
 ## Prerequisites
 
-- [.NET 9 SDK](https://dotnet.microsoft.com/download/dotnet/9.0)
+- [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
 
 No database server is required — the app uses SQLite and creates the database file automatically on first run.
 
@@ -200,7 +218,7 @@ cd src/RegistrationSample.Web
 dotnet run
 ```
 
-The web app reads `ApiBaseUrl` from `src/RegistrationSample.Web/appsettings.json` (defaults to `http://localhost:5257`).
+The Blazor WebAssembly app runs on `http://localhost:5289` (HTTP) / `https://localhost:7071` (HTTPS). It calls the API at the URL configured in `src/RegistrationSample.Web/appsettings.json` under `ApiBaseUrl` (defaults to `http://localhost:5257`).
 
 ---
 
@@ -215,18 +233,24 @@ Registers a new user.
 | Field | Type | Required | Description |
 |---|---|---|---|
 | `firstName` | string | ✓ | |
+| `middleName` | string | | |
 | `lastName` | string | ✓ | |
 | `email` | string | ✓ | Must be unique |
 | `password` | string | ✓ | Min 8 chars, upper + lower + digit |
 | `confirmPassword` | string | ✓ | Must match `password` |
 | `dateOfBirth` | datetime | ✓ | |
 | `gender` | string | ✓ | |
+| `maritalStatus` | string | | |
 | `phone` | string | | |
 | `address` | string | | |
 | `city` | string | | |
 | `state` | string | | |
 | `country` | string | | |
 | `postalCode` | string | | |
+| `occupation` | string | | Professional title |
+| `employer` | string | | Current employer |
+| `yearsOfExperience` | int | | |
+| `linkedInUrl` | string (URL) | | |
 | `institution` | string | ✓ | |
 | `degree` | string | ✓ | |
 | `fieldOfStudy` | string | ✓ | |
@@ -256,9 +280,14 @@ Returns a JWT bearer token.
 ```json
 {
   "token": "<jwt>",
-  "expiration": "..."
+  "userId": "<guid>",
+  "email": "user@example.com",
+  "fullName": "John Doe",
+  "expiration": "<utc-datetime>"
 }
 ```
+
+Tokens are valid for **8 hours**.
 
 ---
 
@@ -270,7 +299,7 @@ Returns the authenticated user's profile.
 
 ### Profile — `PUT /api/profile` *(requires Bearer token)*
 
-Updates the authenticated user's profile. Accepts the same fields as registration (excluding password fields).
+Updates the authenticated user's profile. Accepts the same fields as registration (excluding password fields), plus `profilePictureUrl` (URL string).
 
 ---
 
@@ -314,11 +343,25 @@ src/
 │   └── DependencyInjection.cs      # Extension method to register all services
 │
 └── RegistrationSample.Web/
-    ├── Controllers/
-    │   ├── HomeController.cs
-    │   ├── AccountController.cs
-    │   └── ProfileController.cs
-    └── Program.cs                  # Session, HttpClient to API
+    ├── Pages/                      # Blazor routable components
+    │   ├── Register.razor
+    │   ├── Login.razor
+    │   └── Profile/
+    │       ├── ProfileIndex.razor  # View profile
+    │       └── ProfileEdit.razor   # Edit profile
+    ├── Services/
+    │   ├── TokenService.cs         # localStorage JWT state (token, fullName, userId)
+    │   └── ApiAuthorizationMessageHandler.cs  # Injects Bearer token into HttpClient
+    ├── Models/
+    │   ├── RegisterViewModel.cs
+    │   ├── LoginViewModel.cs
+    │   ├── EditProfileViewModel.cs
+    │   ├── UserProfileViewModel.cs
+    │   ├── AuthResponseViewModel.cs
+    │   └── ErrorViewModel.cs
+    ├── Layout/                     # MainLayout, NavMenu
+    ├── App.razor                   # Client-side router
+    └── Program.cs                  # HttpClient, TokenService, auth handler DI
 ```
 
 ---

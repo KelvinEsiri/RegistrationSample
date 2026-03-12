@@ -1,34 +1,23 @@
-var builder = WebApplication.CreateBuilder(args);
+using Microsoft.AspNetCore.Components.Web;
+using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using RegistrationSample.Web;
+using RegistrationSample.Web.Services;
 
-builder.Services.AddControllersWithViews();
-builder.Services.AddHttpClient("API", client =>
+var builder = WebAssemblyHostBuilder.CreateDefault(args);
+builder.RootComponents.Add<App>("#app");
+builder.RootComponents.Add<HeadOutlet>("head::after");
+
+var apiBase = builder.Configuration["ApiBaseUrl"] ?? "http://localhost:5257";
+
+builder.Services.AddScoped<TokenService>();
+builder.Services.AddScoped(sp =>
 {
-    client.BaseAddress = new Uri(builder.Configuration["ApiBaseUrl"] ?? "https://localhost:7000");
+    var tokenService = sp.GetRequiredService<TokenService>();
+    var handler = new ApiAuthorizationMessageHandler(tokenService)
+    {
+        InnerHandler = new HttpClientHandler()
+    };
+    return new HttpClient(handler) { BaseAddress = new Uri(apiBase) };
 });
 
-builder.Services.AddSession(options =>
-{
-    options.IdleTimeout = TimeSpan.FromHours(8);
-    options.Cookie.HttpOnly = true;
-    options.Cookie.IsEssential = true;
-});
-
-var app = builder.Build();
-
-if (!app.Environment.IsDevelopment())
-{
-    app.UseExceptionHandler("/Home/Error");
-    app.UseHsts();
-}
-
-app.UseHttpsRedirection();
-app.UseStaticFiles();
-app.UseRouting();
-app.UseSession();
-app.UseAuthorization();
-
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
-
-app.Run();
+await builder.Build().RunAsync();

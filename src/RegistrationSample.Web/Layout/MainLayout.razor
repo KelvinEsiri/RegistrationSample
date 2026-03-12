@@ -1,0 +1,59 @@
+@inherits LayoutComponentBase
+@inject TokenService TokenService
+@inject NavigationManager Navigation
+@implements IDisposable
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container">
+        <a class="navbar-brand" href="/"><i class="fas fa-graduation-cap me-2"></i>RegistrationSample</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                @if (TokenService.IsAuthenticated)
+                {
+                    <li class="nav-item">
+                        <a class="nav-link" href="/profile"><i class="fas fa-user me-1"></i>@TokenService.FullName</a>
+                    </li>
+                    <li class="nav-item">
+                        <button class="btn btn-link nav-link" @onclick="Logout">
+                            <i class="fas fa-sign-out-alt me-1"></i>Logout
+                        </button>
+                    </li>
+                }
+                else
+                {
+                    <li class="nav-item"><a class="nav-link" href="/account/login">Login</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/account/register">Register</a></li>
+                }
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container py-4">
+    @Body
+</div>
+
+<footer class="bg-light text-center text-muted py-3 mt-5 border-top">
+    <p class="mb-0">&copy; @DateTime.Now.Year RegistrationSample. All rights reserved.</p>
+</footer>
+
+@code {
+    protected override void OnInitialized()
+    {
+        TokenService.OnChange += StateHasChanged;
+    }
+
+    public void Dispose()
+    {
+        TokenService.OnChange -= StateHasChanged;
+    }
+
+    private async Task Logout()
+    {
+        await TokenService.ClearAsync();
+        Navigation.NavigateTo("/account/login");
+    }
+}

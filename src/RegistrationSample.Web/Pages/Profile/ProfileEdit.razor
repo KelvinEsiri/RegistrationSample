@@ -1,0 +1,214 @@
+@page "/profile/edit"
+
+<PageTitle>Edit Profile</PageTitle>
+
+@if (isLoading)
+{
+    <div class="d-flex justify-content-center mt-5">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+}
+else
+{
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="d-flex align-items-center mb-4">
+                <a href="/profile" class="btn btn-outline-secondary me-3">
+                    <i class="fas fa-arrow-left me-1"></i>Back
+                </a>
+                <h2 class="mb-0"><i class="fas fa-edit me-2 text-primary"></i>Edit Profile</h2>
+            </div>
+
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Update Your Information</h5>
+                </div>
+                <div class="card-body p-4">
+                    @if (!string.IsNullOrEmpty(errorMessage))
+                    {
+                        <div class="alert alert-danger">@errorMessage</div>
+                    }
+
+                    <EditForm Model="model" OnValidSubmit="HandleEdit">
+                        <DataAnnotationsValidator />
+
+                        <h5 class="section-title"><i class="fas fa-user me-2"></i>Personal Information</h5>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">First Name <span class="text-danger">*</span></label>
+                                <InputText @bind-Value="model.FirstName" class="form-control" />
+                                <ValidationMessage For="() => model.FirstName" class="text-danger small" />
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Middle Name</label>
+                                <InputText @bind-Value="model.MiddleName" class="form-control" />
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Last Name <span class="text-danger">*</span></label>
+                                <InputText @bind-Value="model.LastName" class="form-control" />
+                                <ValidationMessage For="() => model.LastName" class="text-danger small" />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Date of Birth</label>
+                                <InputDate @bind-Value="model.DateOfBirth" class="form-control" />
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Gender</label>
+                                <InputSelect @bind-Value="model.Gender" class="form-select">
+                                    <option value="">-- Select --</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                    <option value="Prefer not to say">Prefer not to say</option>
+                                </InputSelect>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Marital Status</label>
+                                <InputSelect @bind-Value="model.MaritalStatus" class="form-select">
+                                    <option value="">-- Select --</option>
+                                    <option value="Single">Single</option>
+                                    <option value="Married">Married</option>
+                                    <option value="Divorced">Divorced</option>
+                                    <option value="Widowed">Widowed</option>
+                                    <option value="Prefer not to say">Prefer not to say</option>
+                                </InputSelect>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Phone Number</label>
+                            <InputText @bind-Value="model.Phone" class="form-control" />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Profile Picture URL</label>
+                            <InputText @bind-Value="model.ProfilePictureUrl" class="form-control" placeholder="https://example.com/photo.jpg" />
+                            <ValidationMessage For="() => model.ProfilePictureUrl" class="text-danger small" />
+                        </div>
+
+                        <h5 class="section-title mt-3"><i class="fas fa-map-marker-alt me-2"></i>Address</h5>
+                        <div class="mb-3">
+                            <label class="form-label">Street Address</label>
+                            <InputText @bind-Value="model.Address" class="form-control" />
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">City</label>
+                                <InputText @bind-Value="model.City" class="form-control" />
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">State</label>
+                                <InputText @bind-Value="model.State" class="form-control" />
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Postal Code</label>
+                                <InputText @bind-Value="model.PostalCode" class="form-control" />
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Country</label>
+                            <InputText @bind-Value="model.Country" class="form-control" />
+                        </div>
+
+                        <h5 class="section-title mt-3"><i class="fas fa-briefcase me-2"></i>Professional Information</h5>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Occupation</label>
+                                <InputText @bind-Value="model.Occupation" class="form-control" />
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Employer / Company</label>
+                                <InputText @bind-Value="model.Employer" class="form-control" />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Years of Experience</label>
+                                <InputNumber @bind-Value="model.YearsOfExperience" class="form-control" min="0" max="60" />
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">LinkedIn Profile URL</label>
+                                <InputText @bind-Value="model.LinkedInUrl" class="form-control" />
+                                <ValidationMessage For="() => model.LinkedInUrl" class="text-danger small" />
+                            </div>
+                        </div>
+
+                        <h5 class="section-title mt-3"><i class="fas fa-graduation-cap me-2"></i>Academic Information</h5>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Institution</label>
+                                <InputText @bind-Value="model.Institution" class="form-control" />
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Degree</label>
+                                <InputSelect @bind-Value="model.Degree" class="form-select">
+                                    <option value="">-- Select --</option>
+                                    <option value="High School Diploma">High School Diploma</option>
+                                    <option value="Associate's">Associate's</option>
+                                    <option value="Bachelor's">Bachelor's</option>
+                                    <option value="Master's">Master's</option>
+                                    <option value="Doctorate">Doctorate</option>
+                                    <option value="Professional">Professional</option>
+                                    <option value="Certificate">Certificate</option>
+                                </InputSelect>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Field of Study</label>
+                                <InputText @bind-Value="model.FieldOfStudy" class="form-control" />
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Graduation Year</label>
+                                <InputNumber @bind-Value="model.GraduationYear" class="form-control" min="1950" max="2040" />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">GPA</label>
+                                <InputText @bind-Value="model.GradePointAverage" class="form-control" />
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Student ID</label>
+                                <InputText @bind-Value="model.StudentId" class="form-control" />
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Academic Year</label>
+                                <InputSelect @bind-Value="model.AcademicYear" class="form-select">
+                                    <option value="">-- Select --</option>
+                                    <option value="100lvl (Freshman)">100lvl (Freshman)</option>
+                                    <option value="200lvl (Sophomore)">200lvl (Sophomore)</option>
+                                    <option value="300lvl (Junior)">300lvl (Junior)</option>
+                                    <option value="400lvl (Senior)">400lvl (Senior)</option>
+                                    <option value="500lvl (Senior)">500lvl (Senior)</option>
+                                    <option value="600lvl (Senior)">600lvl (Senior)</option>
+                                    <option value="Postgraduate">Postgraduate</option>
+                                    <option value="Graduate">Graduate</option>
+                                    <option value="Alumni">Alumni</option>
+                                </InputSelect>
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label">Certifications</label>
+                            <InputTextArea @bind-Value="model.Certifications" class="form-control" rows="3" />
+                        </div>
+
+                        <div class="d-flex gap-3">
+                            <button type="submit" class="btn btn-primary btn-lg" disabled="@isSubmitting">
+                                @if (isSubmitting)
+                                {
+                                    <span class="spinner-border spinner-border-sm me-2"></span>
+                                }
+                                <i class="fas fa-save me-2"></i>Save Changes
+                            </button>
+                            <a href="/profile" class="btn btn-outline-secondary btn-lg">Cancel</a>
+                        </div>
+                    </EditForm>
+                </div>
+            </div>
+        </div>
+    </div>
+}

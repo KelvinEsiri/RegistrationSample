@@ -1,0 +1,193 @@
+@page "/profile"
+
+<PageTitle>My Profile</PageTitle>
+
+@if (isLoading)
+{
+    <div class="d-flex justify-content-center mt-5">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+}
+else if (profile != null)
+{
+    @if (!string.IsNullOrEmpty(successMessage))
+    {
+        <div class="alert alert-success alert-dismissible fade show">
+            <i class="fas fa-check-circle me-2"></i>@successMessage
+            <button type="button" class="btn-close" @onclick="() => successMessage = null"></button>
+        </div>
+    }
+
+    <div class="row mb-4">
+        <div class="col-12 d-flex justify-content-between align-items-center">
+            <h2><i class="fas fa-user-circle me-2 text-primary"></i>My Profile</h2>
+            <a href="/profile/edit" class="btn btn-primary">
+                <i class="fas fa-edit me-2"></i>Update Info
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card text-center p-4">
+                <div class="d-flex justify-content-center mb-3">
+                    @if (!string.IsNullOrEmpty(profile.ProfilePictureUrl))
+                    {
+                        <img src="@profile.ProfilePictureUrl" alt="Profile Picture"
+                             class="rounded-circle" style="width:100px;height:100px;object-fit:cover;" />
+                    }
+                    else
+                    {
+                        <div class="profile-avatar">
+                            @(profile.FirstName?.Substring(0, 1).ToUpper())@(profile.LastName?.Substring(0, 1).ToUpper())
+                        </div>
+                    }
+                </div>
+                <h4>@profile.FirstName @profile.LastName</h4>
+                <p class="text-muted mb-1"><i class="fas fa-envelope me-1"></i>@profile.Email</p>
+                <p class="text-muted mb-0"><i class="fas fa-graduation-cap me-1"></i>@profile.Degree</p>
+                <hr />
+                <div class="text-start">
+                    <small class="text-muted">Member since: @profile.CreatedAt.ToString("MMM dd, yyyy")</small><br />
+                    <small class="text-muted">Last updated: @profile.UpdatedAt.ToString("MMM dd, yyyy")</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-user me-2 text-primary"></i>Personal Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-sm-6 mb-3">
+                            <div class="info-label">First Name</div>
+                            <div class="info-value">@profile.FirstName</div>
+                        </div>
+                        <div class="col-sm-6 mb-3">
+                            <div class="info-label">Last Name</div>
+                            <div class="info-value">@profile.LastName</div>
+                        </div>
+                        <div class="col-sm-6 mb-3">
+                            <div class="info-label">Middle Name</div>
+                            <div class="info-value">@(string.IsNullOrEmpty(profile.MiddleName) ? "—" : profile.MiddleName)</div>
+                        </div>
+                        <div class="col-sm-6 mb-3">
+                            <div class="info-label">Date of Birth</div>
+                            <div class="info-value">@profile.DateOfBirth.ToString("MMMM dd, yyyy")</div>
+                        </div>
+                        <div class="col-sm-6 mb-3">
+                            <div class="info-label">Gender</div>
+                            <div class="info-value">@profile.Gender</div>
+                        </div>
+                        <div class="col-sm-6 mb-3">
+                            <div class="info-label">Marital Status</div>
+                            <div class="info-value">@(string.IsNullOrEmpty(profile.MaritalStatus) ? "—" : profile.MaritalStatus)</div>
+                        </div>
+                        <div class="col-sm-6 mb-3">
+                            <div class="info-label">Phone</div>
+                            <div class="info-value">@(string.IsNullOrEmpty(profile.Phone) ? "—" : profile.Phone)</div>
+                        </div>
+                        <div class="col-sm-6 mb-3">
+                            <div class="info-label">Country</div>
+                            <div class="info-value">@(string.IsNullOrEmpty(profile.Country) ? "—" : profile.Country)</div>
+                        </div>
+                        <div class="col-12 mb-3">
+                            <div class="info-label">Address</div>
+                            <div class="info-value">
+                                @if (!string.IsNullOrEmpty(profile.Address))
+                                {
+                                    @profile.Address
+                                    @if (!string.IsNullOrEmpty(profile.City)) { <text>, @profile.City</text> }
+                                    @if (!string.IsNullOrEmpty(profile.State)) { <text>, @profile.State</text> }
+                                    @if (!string.IsNullOrEmpty(profile.PostalCode)) { <text> @profile.PostalCode</text> }
+                                }
+                                else { <span>—</span> }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-briefcase me-2 text-primary"></i>Professional Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-sm-6 mb-3">
+                            <div class="info-label">Occupation</div>
+                            <div class="info-value">@(string.IsNullOrEmpty(profile.Occupation) ? "—" : profile.Occupation)</div>
+                        </div>
+                        <div class="col-sm-6 mb-3">
+                            <div class="info-label">Employer</div>
+                            <div class="info-value">@(string.IsNullOrEmpty(profile.Employer) ? "—" : profile.Employer)</div>
+                        </div>
+                        <div class="col-sm-6 mb-3">
+                            <div class="info-label">Years of Experience</div>
+                            <div class="info-value">@(profile.YearsOfExperience == 0 ? "—" : profile.YearsOfExperience.ToString())</div>
+                        </div>
+                        <div class="col-sm-6 mb-3">
+                            <div class="info-label">LinkedIn</div>
+                            <div class="info-value">
+                                @if (!string.IsNullOrEmpty(profile.LinkedInUrl))
+                                {
+                                    <a href="@profile.LinkedInUrl" target="_blank" rel="noopener noreferrer">@profile.LinkedInUrl</a>
+                                }
+                                else { <span>—</span> }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-graduation-cap me-2 text-primary"></i>Academic Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-sm-6 mb-3">
+                            <div class="info-label">Institution</div>
+                            <div class="info-value">@(string.IsNullOrEmpty(profile.Institution) ? "—" : profile.Institution)</div>
+                        </div>
+                        <div class="col-sm-6 mb-3">
+                            <div class="info-label">Degree</div>
+                            <div class="info-value">@(string.IsNullOrEmpty(profile.Degree) ? "—" : profile.Degree)</div>
+                        </div>
+                        <div class="col-sm-6 mb-3">
+                            <div class="info-label">Field of Study</div>
+                            <div class="info-value">@(string.IsNullOrEmpty(profile.FieldOfStudy) ? "—" : profile.FieldOfStudy)</div>
+                        </div>
+                        <div class="col-sm-6 mb-3">
+                            <div class="info-label">Graduation Year</div>
+                            <div class="info-value">@(profile.GraduationYear == 0 ? "—" : profile.GraduationYear.ToString())</div>
+                        </div>
+                        <div class="col-sm-4 mb-3">
+                            <div class="info-label">GPA</div>
+                            <div class="info-value">@(string.IsNullOrEmpty(profile.GradePointAverage) ? "—" : profile.GradePointAverage)</div>
+                        </div>
+                        <div class="col-sm-4 mb-3">
+                            <div class="info-label">Student ID</div>
+                            <div class="info-value">@(string.IsNullOrEmpty(profile.StudentId) ? "—" : profile.StudentId)</div>
+                        </div>
+                        <div class="col-sm-4 mb-3">
+                            <div class="info-label">Academic Year</div>
+                            <div class="info-value">@(string.IsNullOrEmpty(profile.AcademicYear) ? "—" : profile.AcademicYear)</div>
+                        </div>
+                        @if (!string.IsNullOrEmpty(profile.Certifications))
+                        {
+                            <div class="col-12 mb-3">
+                                <div class="info-label">Certifications</div>
+                                <div class="info-value">@profile.Certifications</div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
